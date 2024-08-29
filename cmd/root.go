@@ -1,17 +1,34 @@
 package cmd
 
 import (
+	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/cmmarslender/fj2/pkg/jinja2"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "fj2",
 	Short: "Jinja2 CLI templating in a single static binary",
-	Run:   func(cmd *cobra.Command, args []string) {},
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		inputContent, err := os.ReadFile(args[0])
+		if err != nil {
+			log.Fatalf("Error reading input file: %s\n", err.Error())
+		}
+
+		result, err := jinja2.ExpandTemplate(string(inputContent))
+		if err != nil {
+			log.Fatalf("Error expanding template: %s\n", err.Error())
+		}
+
+		fmt.Print(result)
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
